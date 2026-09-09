@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Grade Tracker</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;
+  background:linear-gradient(135deg,#eef2ff 0%,#f8fafc 48%,#e0f2fe 100%);
+  color:#172033;min-height:100vh
+}
+.container{max-width:1180px;margin:0 auto;padding:34px 22px 50px}
+.header{
+  display:flex;justify-content:space-between;align-items:center;gap:20px;
+  margin-bottom:28px
+}
+.brand{display:flex;align-items:center;gap:15px}
+.logo{
+  width:58px;height:58px;border-radius:18px;display:grid;place-items:center;
+  background:linear-gradient(135deg,#4f46e5,#7c3aed);font-size:29px;
+  box-shadow:0 12px 25px rgba(79,70,229,.25)
+}
+h1{margin:0;font-size:30px;letter-spacing:-.6px}
+.subtitle{margin:5px 0 0;color:#64748b;font-size:14px}
+.status{
+  background:#fff;border:1px solid #e2e8f0;padding:10px 15px;border-radius:999px;
+  font-size:13px;color:#15803d;box-shadow:0 5px 18px rgba(15,23,42,.06)
+}
+.status span{display:inline-block;width:8px;height:8px;background:#22c55e;border-radius:50%;margin-right:7px}
+.panel{
+  background:rgba(255,255,255,.88);backdrop-filter:blur(12px);
+  border:1px solid rgba(226,232,240,.9);border-radius:22px;
+  box-shadow:0 18px 50px rgba(15,23,42,.08);padding:25px;margin-bottom:22px
+}
+.form-title{margin:0 0 15px;font-size:18px}
+.form{
+  display:grid;grid-template-columns:1fr 180px 150px;gap:12px;align-items:center
+}
+input{
+  width:100%;padding:13px 15px;border:1px solid #d7dee9;border-radius:12px;
+  outline:none;font-size:14px;background:#fff;transition:.2s
+}
+input:focus{border-color:#6366f1;box-shadow:0 0 0 4px rgba(99,102,241,.1)}
+button{
+  border:0;border-radius:12px;padding:13px 17px;font-weight:600;
+  cursor:pointer;transition:transform .15s,box-shadow .15s,background .15s
+}
+.add-btn{background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;box-shadow:0 8px 18px rgba(79,70,229,.22)}
+button:hover{transform:translateY(-1px)}
+.message{min-height:20px;margin-top:10px;color:#dc2626;font-size:13px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px}
+.stat{
+  background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:20px;
+  box-shadow:0 10px 28px rgba(15,23,42,.06);position:relative;overflow:hidden
+}
+.stat:after{content:"";position:absolute;right:-20px;top:-20px;width:75px;height:75px;border-radius:50%;background:#eef2ff}
+.stat-icon{font-size:22px;margin-bottom:10px}
+.stat-label{color:#64748b;font-size:13px}
+.stat-value{font-size:25px;font-weight:750;margin-top:5px}
+.table-panel{padding:0;overflow:hidden}
+.table-head{display:flex;justify-content:space-between;align-items:center;padding:22px 24px;border-bottom:1px solid #e5e7eb}
+.table-head h2{margin:0;font-size:18px}
+.search{max-width:260px}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{
+  background:#f8fafc;color:#64748b;font-size:12px;text-transform:uppercase;
+  letter-spacing:.6px;text-align:left;padding:14px 24px
+}
+td{padding:16px 24px;border-top:1px solid #edf0f4;font-size:14px}
+tbody tr{transition:.15s}
+tbody tr:hover{background:#fafbff}
+.student{font-weight:650}
+.marks{font-weight:700}
+.badge{display:inline-block;padding:6px 11px;border-radius:999px;font-size:12px;font-weight:750}
+.grade-a{background:#dcfce7;color:#15803d}.grade-b{background:#dbeafe;color:#1d4ed8}
+.grade-c{background:#fef3c7;color:#a16207}.grade-d{background:#ffedd5;color:#c2410c}
+.grade-f{background:#fee2e2;color:#b91c1c}
+.delete{
+  background:#fff1f2;color:#be123c;padding:8px 12px;font-size:12px;
+  border:1px solid #fecdd3
+}
+.delete:hover{background:#ffe4e6}
+.empty{text-align:center;padding:45px;color:#94a3b8}
+.footer{text-align:center;color:#94a3b8;font-size:12px;margin-top:22px}
+@media(max-width:800px){
+  .header{align-items:flex-start;flex-direction:column}.form{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(2,1fr)}.table-head{gap:12px;flex-direction:column;align-items:stretch}
+  .search{max-width:none}
+}
+@media(max-width:480px){.container{padding:22px 13px}.stats{grid-template-columns:1fr 1fr}.panel{padding:18px}}
+</style>
+</head>
+<body>
+<div class="container">
+  <header class="header">
+    <div class="brand">
+      <div class="logo">🎓</div>
+      <div>
+        <h1>Student Grade Tracker</h1>
+        <p class="subtitle">Manage student performance and grades in one place</p>
+      </div>
+    </div>
+    <div class="status"><span></span>System Online</div>
+  </header>
+
+  <section class="panel">
+    <h2 class="form-title">Add New Student</h2>
+    <div class="form">
+      <input id="studentName" placeholder="Enter student name">
+      <input id="studentMarks" type="number" min="0" max="100" placeholder="Marks (0–100)">
+      <button type="button" class="add-btn" id="addBtn">＋ Add Student</button>
+    </div>
+    <div id="message" class="message"></div>
+  </section>
+
+  <section class="stats">
+    <div class="stat"><div class="stat-icon">👥</div><div class="stat-label">Total Students</div><div class="stat-value" id="count">0</div></div>
+    <div class="stat"><div class="stat-icon">📊</div><div class="stat-label">Class Average</div><div class="stat-value" id="avg">0.00</div></div>
+    <div class="stat"><div class="stat-icon">🏆</div><div class="stat-label">Highest Marks</div><div class="stat-value" id="high">0</div></div>
+    <div class="stat"><div class="stat-icon">📈</div><div class="stat-label">Lowest Marks</div><div class="stat-value" id="low">0</div></div>
+  </section>
+
+  <section class="panel table-panel">
+    <div class="table-head">
+      <h2>Student Performance</h2>
+      <input class="search" id="search" placeholder="🔎 Search student...">
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Student</th><th>Marks</th><th>Grade</th><th>Action</th></tr></thead>
+        <tbody id="studentRows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="footer">Student Grade Tracker • Java + Spring Boot + JPA + H2</div>
+</div>
+
+<script>
+const studentName=document.getElementById("studentName");
+const studentMarks=document.getElementById("studentMarks");
+const addBtn=document.getElementById("addBtn");
+const studentRows=document.getElementById("studentRows");
+const count=document.getElementById("count");
+const avg=document.getElementById("avg");
+const high=document.getElementById("high");
+const low=document.getElementById("low");
+const message=document.getElementById("message");
+const search=document.getElementById("search");
+let students=[];
+
+function gradeClass(g){
+  if(g==="A+"||g==="A") return "grade-a";
+  if(g==="B") return "grade-b";
+  if(g==="C") return "grade-c";
+  if(g==="D") return "grade-d";
+  return "grade-f";
+}
+
+function render(){
+  const term=search.value.trim().toLowerCase();
+  const filtered=students.filter(s=>s.name.toLowerCase().includes(term));
+  studentRows.innerHTML="";
+  if(filtered.length===0){
+    studentRows.innerHTML='<tr><td colspan="4" class="empty">No students found. Add a student to get started.</td></tr>';
+  } else {
+    filtered.forEach(s=>{
+      const tr=document.createElement("tr");
+      tr.innerHTML='<td class="student"></td><td class="marks"></td><td><span class="badge '+gradeClass(s.grade)+'"></span></td><td></td>';
+      tr.children[0].textContent=s.name;
+      tr.children[1].textContent=s.marks;
+      tr.children[2].querySelector("span").textContent=s.grade;
+      const btn=document.createElement("button");
+      btn.className="delete"; btn.type="button"; btn.textContent="Delete";
+      btn.addEventListener("click",()=>deleteStudent(s.id));
+      tr.children[3].appendChild(btn);
+      studentRows.appendChild(tr);
+    });
+  }
+  count.textContent=students.length;
+  if(students.length){
+    const marks=students.map(s=>Number(s.marks));
+    avg.textContent=(marks.reduce((a,b)=>a+b,0)/marks.length).toFixed(2);
+    high.textContent=Math.max(...marks);
+    low.textContent=Math.min(...marks);
+  }else{avg.textContent="0.00";high.textContent="0";low.textContent="0";}
+}
+
+async function loadStudents(){
+  try{
+    const r=await fetch("/api/students");
+    if(!r.ok)throw Error();
+    students=await r.json(); render();
+  }catch(e){message.textContent="Unable to connect to the server. Keep Spring Boot running."; }
+}
+
+async function addStudent(){
+  message.textContent="";
+  const name=studentName.value.trim();
+  const marks=Number(studentMarks.value);
+  if(!name){message.textContent="Please enter a student name.";studentName.focus();return;}
+  if(studentMarks.value===""||marks<0||marks>100){message.textContent="Marks must be between 0 and 100.";studentMarks.focus();return;}
+  try{
+    const r=await fetch("/api/students",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name,marks})});
+    if(!r.ok)throw Error();
+    studentName.value="";studentMarks.value="";await loadStudents();studentName.focus();
+  }catch(e){message.textContent="Could not add student. Check the server."; }
+}
+
+async function deleteStudent(id){
+  if(!confirm("Delete this student record?"))return;
+  try{
+    const r=await fetch("/api/students/"+id,{method:"DELETE"});
+    if(!r.ok)throw Error();
+    await loadStudents();
+  }catch(e){message.textContent="Could not delete student."; }
+}
+
+addBtn.addEventListener("click",addStudent);
+studentName.addEventListener("keydown",e=>{if(e.key==="Enter")studentMarks.focus()});
+studentMarks.addEventListener("keydown",e=>{if(e.key==="Enter")addStudent()});
+search.addEventListener("input",render);
+loadStudents();
+</script>
+</body>
+</html>

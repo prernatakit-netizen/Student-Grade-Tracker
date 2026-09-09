@@ -1,0 +1,11 @@
+package com.internship.gradetracker;
+import org.springframework.web.bind.annotation.*;
+import java.util.*;
+@RestController @RequestMapping("/api/students")
+public class StudentController {
+ private final StudentRepository repo;
+ public StudentController(StudentRepository repo){this.repo=repo;}
+ @GetMapping public List<Student> all(){return repo.findAll();}
+ @PostMapping public Student add(@RequestBody Student s){return repo.save(s);}
+ @DeleteMapping("/{id}") public void delete(@PathVariable Long id){repo.deleteById(id);}
+}
